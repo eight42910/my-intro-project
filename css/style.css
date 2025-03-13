@@ -13,32 +13,97 @@ body {
   background-color: #f5f5f5;
 }
 
+/* 基本設定とリセット */
+:root {
+  /* メインカラーパレット */
+  --color-primary: #2c3e50; /* 深みのある紺色 - メインカラー */
+  --color-secondary: #3498db; /* 明るい青 - アクセントカラー */
+  --color-accent: #e74c3c; /* 赤系 - 強調カラー（エラーなど） */
+  --color-success: #2ecc71; /* 緑系 - 成功通知用 */
+
+  /* 背景色とテキストカラー */
+  --color-background: #ffffff; /* 白 - 背景色 */
+  --color-background-alt: #f8f9fa; /* 薄いグレー - 代替背景色 */
+  --color-text: #2c3e50; /* 濃い色 - メインテキスト */
+  --color-text-light: #666; /* グレー - サブテキスト */
+
+  /* UI要素用 */
+  --color-border: #e1e8ef; /* 薄いグレー - ボーダー */
+  --color-shadow: rgba(0, 0, 0, 0.1);
+  --color-hover: #2980b9; /* ホバー時の青 */
+
+  /* その他の設定は維持 */
+  --header-height: 60px;
+  --hamburger-width: 30px;
+  --nav-mobile-width: 70%;
+  --transition-speed: 0.3s;
+  --header-bg-transparent: rgba(255, 255, 255, 0.9);
+  --header-transition: all 0.3s ease;
+}
+
 /* ヘッダーのスタイル */
 .header {
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
+  background-color: var(--color-background);
+  box-shadow: 0 2px 4px var(--color-shadow);
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 100;
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  transition: var(--header-transition);
+}
+
+/* スクロール時のヘッダースタイル */
+.header.transparent {
+  background-color: var(--header-bg-transparent);
+  backdrop-filter: blur(8px); /* ぼかしエフェクト */
+  -webkit-backdrop-filter: blur(8px); /* Safari対応 */
+}
+
+/* ナビゲーション */
+.nav {
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .nav-list {
   display: flex;
-  justify-content: center;
   list-style: none;
   gap: 2rem;
+  margin: 0;
+  padding: 0;
 }
 
+/* ナビゲーションリンクのスタイル */
 .nav-list a {
   text-decoration: none;
-  color: #333;
+  color: var(--color-primary);
   font-weight: bold;
-  transition: color 0.3s ease;
+  position: relative; /* 下線アニメーション用 */
+  transition: color var(--transition-speed) ease;
 }
 
+/* ホバー時の色変更 */
 .nav-list a:hover {
-  color: #007bff;
+  color: var(--color-secondary);
+}
+
+/* オプション：下線アニメーションを追加する場合 */
+.nav-list a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--color-secondary);
+  transition: width var(--transition-speed) ease;
+}
+
+.nav-list a:hover::after {
+  width: 100%;
 }
 
 /* メインコンテンツのスタイル */
@@ -83,14 +148,53 @@ body {
 }
 
 .blog-post {
-  padding: 1rem;
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background-color: var(--color-background);
 }
 
-.blog-post time {
-  color: #666;
-  font-size: 0.9rem;
+.blog-post:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--color-shadow);
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.read-more-btn,
+.submit-button {
+  background-color: var(--color-secondary);
+  color: var(--color-background);
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.read-more-btn:hover,
+.submit-button:hover {
+  background-color: var(--color-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px var(--color-shadow);
+}
+
+/* アクティブ（クリック）時のスタイル */
+.read-more-btn:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.read-more-btn:focus {
+  outline: 2px solid #0056b3;
+  outline-offset: 2px;
 }
 
 /* フッターのスタイル */
@@ -120,6 +224,21 @@ h2 {
 h3 {
   font-size: 1.2rem;
 }
+/* 画像の最適化 */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.profile-image img {
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
 /* タブレット以上のスタイル */
 @media (min-width: 768px) {
@@ -130,6 +249,370 @@ h3 {
   .blog-posts {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    justify-content: center;
+    /* grid-template-columns: 1fr 1fr; */
+    /* グリッドの列数を固定（3列）*/
+    /* grid-template-columns: repeat(3, 300px); */
+    /* グリッドの列数を自動調整（ブラウザの幅に応じて列数を変える）*/
+    /* grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); */
+    /* グリッドの列数を自動調整（余白部分を最小にする）*/
+    /* grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); */
     gap: 2rem;
   }
+}
+
+/* ハンバーガーメニュー */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: var(--hamburger-width);
+  height: var(--hamburger-width);
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 101;
+  padding: 0;
+}
+
+.hamburger-line {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-primary);
+  position: relative;
+  transition: transform var(--transition-speed), opacity var(--transition-speed);
+}
+
+.hamburger-line:not(:last-child) {
+  margin-bottom: 8px;
+}
+
+/* メディアクエリ */
+@media (max-width: 767px) {
+  .header {
+    position: relative;
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 70%;
+    height: 100vh;
+    background-color: var(--color-background);
+    padding-top: var(--header-height);
+    transition: right 0.3s ease;
+    z-index: 100;
+  }
+
+  .nav.active {
+    right: 0;
+    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .nav-list {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-list li {
+    margin: 1rem 0;
+  }
+
+  /* ハンバーガーメニューのアニメーション */
+  .hamburger.active .hamburger-line:nth-child(1) {
+    transform: translateY(10px) rotate(45deg);
+  }
+
+  .hamburger.active .hamburger-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .hamburger.active .hamburger-line:nth-child(3) {
+    transform: translateY(-10px) rotate(-45deg);
+  }
+}
+
+/* スクロールトップボタン */
+.scroll-top-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-secondary);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.scroll-top-button.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.scroll-top-button:hover {
+  background-color: var(--color-primary);
+  transform: translateY(-2px);
+}
+
+/* オーバーレイのスタイル */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 90;
+}
+
+/* モバイルメニューのスタイル */
+@media (max-width: 767px) {
+  .nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 70%;
+    height: 100vh;
+    background-color: var(--color-background);
+    padding-top: var(--header-height);
+    transition: right 0.3s ease;
+    z-index: 100;
+  }
+
+  .nav.active {
+    right: 0;
+    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .hamburger {
+    z-index: 110;
+  }
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: 2rem;
+  color: #ff0000;
+}
+
+.error button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error button:hover {
+  background-color: #0056b3;
+}
+
+/* フォームのスタイル */
+.contact-form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.required {
+  color: #ff4444;
+  margin-left: 3px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.form-group textarea {
+  min-height: 150px;
+  resize: vertical;
+}
+
+.error-message {
+  background-color: rgba(231, 76, 60, 0.1);
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  font-size: 14px;
+  margin-top: 5px;
+  display: none;
+}
+
+.error-message.show {
+  display: block;
+}
+
+.submission-status {
+  margin-top: 20px;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.submission-status.success {
+  background-color: rgba(46, 204, 113, 0.1);
+  border: 1px solid var(--color-success);
+  color: var(--color-success);
+}
+
+.submission-status.error {
+  background-color: #f2dede;
+  color: #a94442;
+  border: 1px solid #ebccd1;
+}
+
+/* ブログ検索 */
+.blog-search {
+  margin-bottom: 2rem;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 1rem;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+  outline: none;
+}
+
+/* モーダル */
+.post-detail-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(44, 62, 80, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--color-background);
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 8px 24px var(--color-shadow);
+}
+
+.close-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* コメント */
+.post-comments {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.comment {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: var(--color-background-alt);
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+}
+
+/* ブログ記事のスタイル追加 */
+.post-meta-header {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.category {
+  background-color: var(--color-secondary);
+  color: var(--color-background);
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-right: 1rem;
+}
+
+.author {
+  color: #666;
+}
+
+.error-message {
+  text-align: center;
+  padding: 2rem;
+  background-color: #fff3f3;
+  border: 1px solid #ffcdd2;
+  border-radius: 4px;
+}
+
+.error-message button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error-message button:hover {
+  background-color: #0056b3;
 }

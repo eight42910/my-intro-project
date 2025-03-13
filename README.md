@@ -11,5 +11,5 @@ HTML/CSS を使用して作成した自己紹介ページです。
 ## 使用技術
 
 - HTML5
-- CSS3（Flexbox）
+- CSS3（FlexBox）
 - レスポンシブデザイン

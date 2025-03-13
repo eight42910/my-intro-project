@@ -5,9 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>自己紹介ページ</title>
     <link rel="stylesheet" href="css/style.css" />
+    <script src="js/main.js"></script>
   </head>
   <body>
     <header class="header">
+      <button class="hamburger" aria-label="メニュー">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </button>
+
       <nav class="nav">
         <ul class="nav-list">
           <li><a href="#profile">プロフィール</a></li>
@@ -22,6 +29,7 @@
         <h1>プロフィール</h1>
         <div class="profile-content">
           <div class="profile-image">
+            <img src="images/IMG_5445.JPG" alt="プロフィール画像" />
             <!-- プロフィール画像を追加予定 -->
           </div>
           <div class="profile-text">
@@ -32,6 +40,7 @@
       </section>
 
       <section id="blog" class="section">
+        <!-- 最近の投稿 -->
         <h2>最近の投稿</h2>
         <div class="blog-posts">
           <article class="blog-post">
@@ -44,18 +53,54 @@
             <p>記事の内容がここに入ります。</p>
             <time datetime="2024-03-20">2024年3月20日</time>
           </article>
+          <article class="blog-post">
+            <h3>記事タイトル3</h3>
+            <p>記事の内容がここに入ります。</p>
+            <time datetime="2024-03-19">2024年3月19日</time>
+          </article>
         </div>
       </section>
 
+      <!-- お問い合わせ -->
       <section id="contact" class="section">
         <h2>お問い合わせ</h2>
-        <div class="contact-info">
-          <p>お問い合わせは以下のリンクからお願いします。</p>
-          <!-- 後ほどお問い合わせフォームやリンクを追加予定 -->
-        </div>
+        <form id="contact-form" class="contact-form">
+          <div class="form-group">
+            <label for="name">お名前 <span class="required">*</span></label>
+            <input type="text" id="name" name="name" required />
+            <span class="error-message" data-error="name"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="email"
+              >メールアドレス <span class="required">*</span></label
+            >
+            <input type="email" id="email" name="email" required />
+            <span class="error-message" data-error="email"></span>
+          </div>
+
+          <div class="form-group">
+            <label for="subject">件名</label>
+            <input type="text" id="subject" name="subject" />
+          </div>
+
+          <div class="form-group">
+            <label for="message"
+              >メッセージ <span class="required">*</span></label
+            >
+            <textarea id="message" name="message" required></textarea>
+            <span class="error-message" data-error="message"></span>
+          </div>
+
+          <div class="form-group">
+            <button type="submit" class="submit-button">送信する</button>
+          </div>
+        </form>
+        <div id="submission-status" class="submission-status"></div>
       </section>
     </main>
 
+    <!-- フッター -->
     <footer class="footer">
       <p>&copy; 2024 自己紹介ページ All Rights Reserved.</p>
     </footer>
