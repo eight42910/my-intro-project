@@ -503,24 +503,43 @@ img {
 
 /* ブログ検索 */
 .blog-search {
-  margin-bottom: 2rem;
+  margin-bottom: 40px; /* 下部に大きめの余白 */
+  padding: 20px 0; /* 上下のパディング */
+  border-bottom: 1px solid #eee; /* 区切り線を追加 */
 }
 
+/* 検索入力フィールドのスタイル */
 .search-input {
   width: 100%;
-  padding: 0.8rem;
-  border: 1px solid var(--color-border);
+  max-width: 400px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ddd;
   border-radius: 4px;
-  font-size: 1rem;
-  color: var(--color-text);
-  background-color: var(--color-background);
-  transition: all 0.3s ease;
+  margin-bottom: 20px;
 }
 
-.search-input:focus {
-  border-color: var(--color-secondary);
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
-  outline: none;
+/* ブログセクションのタイトル用スタイル */
+#blog h2 {
+  margin-top: 30px; /* タイトル上部の余白 */
+  margin-bottom: 20px; /* タイトル下部の余白 */
+}
+
+/* フィルターとソート機能のコンテナ */
+.filter-controls {
+  display: flex;
+  gap: 20px; /* 要素間の間隔 */
+  margin-bottom: 30px;
+  align-items: center;
+}
+
+/* カテゴリーフィルターとソートセレクトのスタイル */
+.category-filter select,
+.sort-select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
 }
 
 /* モーダル */
