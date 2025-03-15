@@ -1,40 +1,84 @@
 /**
- * 定数・設定の管理
- * アプリケーション全体で使用する設定値を一元管理
+ * アプリケーション全体の構成
+ *
+ * 1. CONFIG (設定): アプリケーション全体の設定値を管理
+ * 2. utils (ユーティリティ): 共通で使用する汎用的な関数群
+ * 3. UIController: UI/UXの制御を担当
+ * 4. BlogPostManager: ブログ記事の管理と表示を担当
+ * 5. ContactForm: お問い合わせフォームの制御を担当
+ * 6. App: アプリケーション全体の初期化を担当
+ *
+ * 各クラスは単一責任の原則に従い、特定の機能に特化しています。
+ * イベント駆動型のアーキテクチャを採用し、ユーザーの操作に応じて適切に動作します。
+ */
+
+/**
+ * アプリケーション全体の定数オブジェクト
+ * アプリケーション全体で使用する設定値を一元管理します
+ *
+ * @type {Object} CONFIG
+ * @property {Object} scroll - スクロール関連の設定
+ * @property {Object} blog - ブログ機能の設定
  */
 const CONFIG = {
-  // スクロール関連の設定
+  // スクロール関連の設定 - ヘッダーの透明度やスクロールの挙動を制御
   scroll: {
-    threshold: 100,
-    headerOpacityMax: 0.9,
-    headerOpacityMin: 0.6,
-    buttonShowThreshold: 100,
+    threshold: 100, // スクロール開始のしきい値(px)
+    headerOpacityMax: 0.9, // ヘッダーの最大不透明度
+    headerOpacityMin: 0.6, // ヘッダーの最小不透明度
+    buttonShowThreshold: 100, // トップへ戻るボタンの表示しきい値(px)
   },
-  // ブログ関連の設定
+  // ブログ機能の設定 - 記事の表示方法や初期状態を定義
   blog: {
-    defaultSortOrder: "newest",
-    defaultFilter: "all",
-    postsPerPage: 10,
+    defaultSortOrder: "newest", // デフォルトの並び順（新しい順）
+    defaultFilter: "all", // デフォルトのフィルター（全カテゴリー）
+    postsPerPage: 10, // 1ページあたりの表示件数
   },
 };
 
 /**
- * ユーティリティ関数
- * 共通で使用する汎用的な関数群
+ * ユーティリティ関数群
+ * アプリケーション全体で使用する汎用的な関数をまとめたオブジェクト
+ *
+ * @namespace utils
+ * @property {Function} formatDate - 日付のフォーマット
+ * @property {Function} handleError - エラー処理
+ * @property {Function} createElement - DOM要素の作成
  */
 const utils = {
-  // 日付フォーマット
+  /**
+   * 日付を日本語形式にフォーマットする
+   * 例: "2023-12-25" → "2023年12月25日"
+   *
+   * @param {string} date - ISO形式の日付文字列
+   * @returns {string} フォーマットされた日付文字列
+   */
   formatDate(date) {
     return new Date(date).toLocaleDateString("ja-JP");
   },
 
-  // エラーハンドリング
+  /**
+   * エラーハンドリングを統一的に処理
+   * エラーログを出力し、フォールバック値を返す
+   *
+   * @param {Error} error - エラーオブジェクト
+   * @param {*} fallback - エラー時の代替値
+   * @returns {*} fallback値
+   */
   handleError(error, fallback) {
     console.error("エラーが発生しました:", error);
     return fallback;
   },
 
-  // DOM要素の作成
+  /**
+   * DOM要素を効率的に作成
+   * 要素の作成、クラス設定、内容の設定を一括で行う
+   *
+   * @param {string} tag - HTML要素名（div, span等）
+   * @param {string} className - CSSクラス名
+   * @param {string} innerHTML - 内部HTML
+   * @returns {HTMLElement} 作成されたDOM要素
+   */
   createElement(tag, className, innerHTML = "") {
     const element = document.createElement(tag);
     if (className) element.className = className;
@@ -44,25 +88,49 @@ const utils = {
 };
 
 /**
- * UIコントロール関連のクラス
- * ヘッダーやスクロールなどのUI制御を担当
+ * UIの制御を行うクラス
+ * ヘッダーの透明度制御やスムーズスクロールなど、
+ * ユーザーインターフェースの動的な制御を担当
+ *
+ * @class UIController
+ * @property {HTMLElement} #header - ヘッダー要素
+ * @property {number} #scrollThreshold - スクロールのしきい値
  */
 class UIController {
   #header;
   #scrollThreshold;
 
+  /**
+   * UIControllerのインスタンスを初期化
+   * ヘッダー要素の取得と初期設定を行う
+   *
+   * @constructor
+   * @param {string} headerSelector - ヘッダー要素のCSSセレクター
+   */
   constructor(headerSelector = ".header") {
     this.#header = document.querySelector(headerSelector);
     this.#scrollThreshold = CONFIG.scroll.threshold;
     this.init();
   }
 
+  /**
+   * UIの初期化
+   * スクロールイベントとスムーズスクロールの設定を行う
+   *
+   * @private
+   */
   init() {
     if (!this.#header) return;
     this.setupScrollEvents();
     this.setupSmoothScroll();
   }
 
+  /**
+   * スクロールイベントの設定
+   * スクロール位置に応じてヘッダーの透明度を動的に制御
+   *
+   * @private
+   */
   setupScrollEvents() {
     window.addEventListener("scroll", () => {
       const scrollTop = window.scrollY;
@@ -71,6 +139,14 @@ class UIController {
     });
   }
 
+  /**
+   * ヘッダーの不透明度を計算
+   * スクロール位置に基づいて適切な不透明度を算出
+   *
+   * @private
+   * @param {number} scrollTop - 現在のスクロール位置
+   * @returns {number} 計算された不透明度（0-1）
+   */
   calculateOpacity(scrollTop) {
     return Math.min(
       CONFIG.scroll.headerOpacityMax,
@@ -81,12 +157,25 @@ class UIController {
     );
   }
 
+  /**
+   * ヘッダーのスタイルを更新
+   * 不透明度とブラー効果を動的に設定
+   *
+   * @private
+   * @param {number} opacity - 設定する不透明度
+   */
   updateHeaderStyle(opacity) {
     if (!this.#header) return;
     this.#header.style.backgroundColor = `rgba(255, 255, 255, ${opacity})`;
     this.#header.style.backdropFilter = `blur(${8 * (1 - opacity)}px)`;
   }
 
+  /**
+   * スムーズスクロールの設定
+   * ページ内リンクのクリック時に、目的地までスムーズにスクロール
+   *
+   * @private
+   */
   setupSmoothScroll() {
     document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
       anchor.addEventListener("click", (e) => {
@@ -101,21 +190,31 @@ class UIController {
 }
 
 /**
- * ブログ管理クラス
- * ブログ投稿の表示、フィルタリング、検索機能を管理
+ * ブログ投稿を管理するクラス
+ * 記事の取得、表示、フィルタリング、ソートなどの
+ * ブログ機能全般を制御
+ *
+ * @class BlogPostManager
+ * @property {Object} #state - ブログの状態を管理するオブジェクト
  */
 class BlogPostManager {
   #state = {
-    posts: [],
-    categories: new Set(),
-    currentFilter: CONFIG.blog.defaultFilter,
-    sortOrder: CONFIG.blog.defaultSortOrder,
+    posts: [], // 全ての投稿データ
+    categories: new Set(), // 利用可能なカテゴリー
+    currentFilter: CONFIG.blog.defaultFilter, // 現在のフィルター設定
+    sortOrder: CONFIG.blog.defaultSortOrder, // 現在のソート順
   };
 
   constructor() {
     this.init();
   }
 
+  /**
+   * ブログ機能の初期化
+   * データの取得、カテゴリーの設定、UI要素の構築を行う
+   *
+   * @private
+   */
   async init() {
     try {
       await this.fetchPosts();
@@ -127,12 +226,24 @@ class BlogPostManager {
     }
   }
 
+  /**
+   * UI要素のセットアップ
+   * 検索、ソート、カテゴリーフィルターの機能を初期化
+   *
+   * @private
+   */
   setupUI() {
     this.setupSearchFeature();
     this.setupSortingFeature();
     this.setupCategoryFilter();
   }
 
+  /**
+   * 投稿データの取得
+   * サーバーからブログ記事データを非同期で取得
+   *
+   * @private
+   */
   async fetchPosts() {
     try {
       const response = await fetch("/data/posts.json");
@@ -154,6 +265,13 @@ class BlogPostManager {
     }
   }
 
+  /**
+   * 投稿の表示
+   * 記事一覧をHTML形式で表示
+   *
+   * @private
+   * @param {Array} posts - 表示する投稿の配列
+   */
   renderPosts(posts = this.#state.posts) {
     const container = document.querySelector(".blog-posts");
     if (!container) return;
@@ -182,6 +300,12 @@ class BlogPostManager {
     container.innerHTML = postsHTML || "<p>投稿がありません。</p>";
   }
 
+  /**
+   * カテゴリーの初期化
+   * 利用可能なカテゴリーを投稿から抽出
+   *
+   * @private
+   */
   initializeCategories() {
     this.#state.categories = new Set(
       this.#state.posts.map((post) => post.category)
@@ -189,6 +313,12 @@ class BlogPostManager {
     this.setupCategoryFilter();
   }
 
+  /**
+   * カテゴリーフィルターの設定
+   * カテゴリー選択UIの構築と制御
+   *
+   * @private
+   */
   setupCategoryFilter() {
     const filterContainer = utils.createElement("div", "category-filter");
     const select = utils.createElement("select", "category-select");
@@ -209,18 +339,15 @@ class BlogPostManager {
     });
 
     filterContainer.appendChild(select);
-
-    // この部分は、カテゴリーフィルターをブログセクションの先頭に挿入する処理です。
-    // 1. document.querySelector("#blog")でブログセクションの要素を取得
-    // 2. ブログセクションが存在する場合(if (blogSection))、
-    // 3. insertBeforeメソッドを使用して、filterContainerをブログセクションの最初の子要素として挿入
-    // ただし、現在はコメントアウトされているため実行されません
-    // const blogSection = document.querySelector("#blog");
-    // if (blogSection) {
-    //   blogSection.insertBefore(filterContainer, blogSection.firstChild);
-    // }
   }
 
+  /**
+   * カテゴリーによるフィルタリング
+   * 選択されたカテゴリーの投稿のみを表示
+   *
+   * @private
+   * @param {string} category - フィルタリングするカテゴリー
+   */
   filterByCategory(category) {
     this.#state.currentFilter = category;
     const filteredPosts =
@@ -230,6 +357,12 @@ class BlogPostManager {
     this.renderPosts(filteredPosts);
   }
 
+  /**
+   * 検索機能の設定
+   * キーワードによる記事の検索機能を実装
+   *
+   * @private
+   */
   setupSearchFeature() {
     const searchInput = utils.createElement("input", "search-input");
     searchInput.type = "search";
@@ -250,6 +383,12 @@ class BlogPostManager {
     }
   }
 
+  /**
+   * ソート機能の設定
+   * 投稿の日付によるソート機能を実装
+   *
+   * @private
+   */
   setupSortingFeature() {
     const select = utils.createElement("select", "sort-select");
     select.innerHTML = `
@@ -267,6 +406,12 @@ class BlogPostManager {
     }
   }
 
+  /**
+   * 投稿のソート処理
+   * 日付に基づいて投稿を並び替え
+   *
+   * @private
+   */
   sortPosts() {
     const sorted = [...this.#state.posts].sort((a, b) => {
       const dateA = new Date(a.date);
@@ -278,8 +423,12 @@ class BlogPostManager {
 }
 
 /**
- * フォーム管理クラス
- * お問い合わせフォームの処理を管理
+ * お問い合わせフォームを管理するクラス
+ * フォームの検証、送信、エラー表示を制御
+ *
+ * @class ContactForm
+ * @property {HTMLFormElement} form - フォーム要素
+ * @property {HTMLElement} statusDiv - 送信状態表示要素
  */
 class ContactForm {
   constructor(formId) {
@@ -288,17 +437,37 @@ class ContactForm {
     if (this.form) this.init();
   }
 
+  /**
+   * フォームの初期化
+   * イベントリスナーとバリデーションの設定
+   *
+   * @private
+   */
   init() {
     this.form.addEventListener("submit", this.handleSubmit.bind(this));
     this.setupValidation();
   }
 
+  /**
+   * バリデーションの設定
+   * 必須フィールドのチェックを実装
+   *
+   * @private
+   */
   setupValidation() {
     this.form.querySelectorAll("[required]").forEach((field) => {
       field.addEventListener("blur", () => this.validateField(field));
     });
   }
 
+  /**
+   * フィールドの検証
+   * 個別フィールドのバリデーションを実行
+   *
+   * @private
+   * @param {HTMLElement} field - 検証するフィールド要素
+   * @returns {boolean} バリデーション結果
+   */
   validateField(field) {
     const errorSpan = this.form.querySelector(`[data-error="${field.name}"]`);
     const isValid = field.value.trim() !== "";
@@ -311,11 +480,25 @@ class ContactForm {
     return isValid;
   }
 
+  /**
+   * フォーム全体の検証
+   * 全必須フィールドのバリデーションを実行
+   *
+   * @private
+   * @returns {boolean} フォーム全体のバリデーション結果
+   */
   validateForm() {
     const fields = this.form.querySelectorAll("[required]");
     return Array.from(fields).every((field) => this.validateField(field));
   }
 
+  /**
+   * フォーム送信の処理
+   * バリデーション実行と送信処理を制御
+   *
+   * @private
+   * @param {Event} e - イベントオブジェクト
+   */
   handleSubmit(e) {
     e.preventDefault();
     if (!this.validateForm()) {
@@ -331,6 +514,14 @@ class ContactForm {
     this.form.reset();
   }
 
+  /**
+   * ステータスメッセージの表示
+   * フォーム送信結果をユーザーに通知
+   *
+   * @private
+   * @param {string} message - 表示するメッセージ
+   * @param {string} type - メッセージのタイプ（success/error）
+   */
   showStatus(message, type) {
     if (!this.statusDiv) return;
 
@@ -345,10 +536,18 @@ class ContactForm {
 }
 
 /**
- * アプリケーションの初期化
- * 全体の初期化処理を管理
+ * アプリケーション全体の初期化を管理するクラス
+ * 各コンポーネントの初期化を制御
+ *
+ * @class App
  */
 class App {
+  /**
+   * アプリケーションの初期化
+   * DOMの読み込み完了後に各コンポーネントを初期化
+   *
+   * @static
+   */
   static init() {
     document.addEventListener("DOMContentLoaded", () => {
       try {
@@ -362,4 +561,5 @@ class App {
   }
 }
 
+// アプリケーションの初期化を実行
 App.init();
